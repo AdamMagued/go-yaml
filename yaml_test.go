@@ -535,3 +535,28 @@ func TestValueToNode_HashWithoutWhitespace(t *testing.T) {
 	}
 }
 
+func TestMarshal_HashWithoutWhitespace(t *testing.T) {
+	t.Run("map key with hash is quoted", func(t *testing.T) {
+		m := map[string]string{"foo#bar": "value"}
+		b, err := yaml.Marshal(m)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		expected := "\"foo#bar\": value\n"
+		if string(b) != expected {
+			t.Fatalf("expected %q, got %q", expected, string(b))
+		}
+	})
+
+	t.Run("scalar value with hash is not quoted", func(t *testing.T) {
+		m := map[string]string{"key": "foo#bar"}
+		b, err := yaml.Marshal(m)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		expected := "key: foo#bar\n"
+		if string(b) != expected {
+			t.Fatalf("expected %q, got %q", expected, string(b))
+		}
+	})
+}
